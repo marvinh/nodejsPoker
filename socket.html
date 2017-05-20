@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title> Poker </title>
+    <script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.js'></script>
+    <script type='text/javascript'>
+        let hand = null;
+        let user = null;
+        let values = null;
+        var socket = io('http://localhost:3000', {path: '/socket.io'}); // connect to server
+        socket.on('fromServer', function(data) { // listen for fromServer message
+        console.log('Received ' + data.id + ' from server');
+
+         socket.on('winner', function(data){
+        document.getElementById('message').innerHTML= "We have a winner TODO";
+    });
+
+       
+        document.getElementById('user').innerHTML = "Username: " +data.id + " Score: "+ data.score +" Round: "+ data.round;
+        if(data.hand != null){
+            hand = data.hand;
+            user = data.id;
+            document.getElementById('hand').innerHTML = "<div>";
+       
+        document.getElementById('hand').innerHTML += "<input name = 'card' type='checkbox' id='0'>" + data.hand[0]+"</input>";
+        document.getElementById('hand').innerHTML += "<input name = 'card' type='checkbox' id='1'>" + data.hand[1]+"</input>";
+        document.getElementById('hand').innerHTML += "<input name = 'card' type='checkbox' id='2'>" + data.hand[2]+"</input>";
+        document.getElementById('hand').innerHTML += "<input name = 'card' type='checkbox' id='3'>" + data.hand[3]+"</input>";
+        document.getElementById('hand').innerHTML += "<input name = 'card' type='checkbox' id='4'>" + data.hand[4]+"</input>";
+        document.getElementById('hand').innerHTML += "</div>";
+        document.getElementById('message').innerHTML = "<p> "+ data.message + " </p>";
+        
+    }
+     
+      document.getElementById('button').onclick = function(){
+        let values = [];
+        for(var i = 0 ; i < 5; i ++)
+        {
+            if(document.getElementById(i).checked)
+            {
+                values.push(i);
+            }
+        }
+        if(values.length == 0)
+        {
+            values.push(-1);
+        }
+        socket.emit('fromClient',{id: user, hand: hand, trash: values});
+        
+    };     
+        socket.emit('fromClient',{id: null, hand: hand,trash: null});
+        
+    });
+    
+   
+
+
+   
+
+    </script>
+
+</head>
+
+<body>
+<div>
+    <h1>
+        Round will begin when 2 clients are connected
+    </h1>
+    
+    <p id="user">
+    </p>
+    
+</div>
+<input type = 'button' id='button' value='Trash'> </input>
+<div id="hand">
+
+</div>
+<div id="message">
+
+</div>
+
+</body>
